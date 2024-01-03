@@ -6,7 +6,7 @@ namespace BiblioApp.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+           //jf
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
