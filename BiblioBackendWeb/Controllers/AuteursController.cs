@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BiblioBackendWeb.Models;
+using BiblioBackendWeb.Repository.Implementations;
 
 namespace BiblioBackendWeb.Controllers
 {
-    public class AuteursController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuteursController : ControllerBase
     {
         private readonly BibliothequeDbContext _context;
 
@@ -18,134 +21,84 @@ namespace BiblioBackendWeb.Controllers
             _context = context;
         }
 
-        // GET: Auteurs
-        public async Task<IActionResult> Index()
+        // GET: api/Auteurs
+        [HttpGet]
+        public  IEnumerable<Auteur> GetAuteurs()
         {
-            return View(await _context.Auteurs.ToListAsync());
+           using(UnitOfWork uow = new(new BibliothequeDbContext()))
+            {
+                return uow.Auteur.GetAll();
+            }
         }
 
-        // GET: Auteurs/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Auteurs/5
+        [HttpGet("{id}")]
+        public Auteur GetAuteur(int id)
         {
-            if (id == null)
+            using (UnitOfWork uow = new(new BibliothequeDbContext()))
             {
-                return NotFound();
+                return uow.Auteur.Get(id);
             }
-
-            var auteur = await _context.Auteurs
-                .FirstOrDefaultAsync(m => m.IdAuteur == id);
-            if (auteur == null)
-            {
-                return NotFound();
-            }
-
-            return View(auteur);
         }
 
-        // GET: Auteurs/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Auteurs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdAuteur,NomAuteur,Email,Genre")] Auteur auteur)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(auteur);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(auteur);
-        }
-
-        // GET: Auteurs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var auteur = await _context.Auteurs.FindAsync(id);
-            if (auteur == null)
-            {
-                return NotFound();
-            }
-            return View(auteur);
-        }
-
-        // POST: Auteurs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdAuteur,NomAuteur,Email,Genre")] Auteur auteur)
+        // PUT: api/Auteurs/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAuteur(int id, Auteur auteur)
         {
             if (id != auteur.IdAuteur)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(auteur).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(auteur);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AuteurExists(auteur.IdAuteur))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(auteur);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AuteurExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Auteurs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/Auteurs
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Auteur>> PostAuteur(Auteur auteur)
         {
-            if (id == null)
+            using (UnitOfWork uow = new(new BibliothequeDbContext()))
             {
-                return NotFound();
+                uow.Auteur.Add(auteur);
+                uow.Complete();
             }
+            return CreatedAtAction("GetAuteur", new { id = auteur.IdAuteur }, auteur);
+        }
 
-            var auteur = await _context.Auteurs
-                .FirstOrDefaultAsync(m => m.IdAuteur == id);
+        // DELETE: api/Auteurs/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAuteur(int id)
+        {
+            var auteur = await _context.Auteurs.FindAsync(id);
             if (auteur == null)
             {
                 return NotFound();
             }
 
-            return View(auteur);
-        }
-
-        // POST: Auteurs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var auteur = await _context.Auteurs.FindAsync(id);
-            if (auteur != null)
-            {
-                _context.Auteurs.Remove(auteur);
-            }
-
+            _context.Auteurs.Remove(auteur);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool AuteurExists(int id)

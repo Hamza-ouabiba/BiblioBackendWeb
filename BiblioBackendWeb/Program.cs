@@ -1,8 +1,10 @@
+using BiblioBackendWeb.Models;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-
+builder.Services.AddDbContext<BibliothequeDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("BibliothequeDb")));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

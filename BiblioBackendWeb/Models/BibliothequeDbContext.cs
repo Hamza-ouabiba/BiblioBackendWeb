@@ -30,7 +30,7 @@ public partial class BibliothequeDbContext : DbContext
     public virtual DbSet<Reservation> Reservations { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=.;Database=BibliothequeDb;Trusted_Connection=True;Encrypt=False");
+        => optionsBuilder.UseSqlServer("Server=.\\;Database=BibliothequeDb;Trusted_Connection=True;Encrypt=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
