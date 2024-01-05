@@ -11,7 +11,7 @@ public partial class Adherent
 
     public string? PrenomAdherent { get; set; }
 
-    public DateOnly? DateInscription { get; set; }
+    public DateTime? DateInscription { get; set; }
 
     public string? Email { get; set; }
 
