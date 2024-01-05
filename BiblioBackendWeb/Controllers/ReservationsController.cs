@@ -46,7 +46,7 @@ namespace BiblioBackendWeb.Controllers
         // PUT: api/Reservations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async void PutReservation(int id, int idLivre, int idAdherent, DateTime dateDebut, DateTime dateFin)
+        public  void PutReservation(int id, int idLivre, int idAdherent, DateTime dateDebut, DateTime dateFin)
         {
             using (UnitOfWork uow = new(new BibliothequeDbContext()))
             {
@@ -65,7 +65,7 @@ namespace BiblioBackendWeb.Controllers
         // POST: api/Reservations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async void PostReservation(int idAdherent,DateTime dateDebut, DateTime dateFin)
+        public async void PostReservation(int idAdherent,int idLivre, DateTime dateDebut, DateTime dateFin)
         {
             using (UnitOfWork uow = new(new BibliothequeDbContext()))
             {
@@ -73,7 +73,8 @@ namespace BiblioBackendWeb.Controllers
                 {
                     IdAdherent = idAdherent,
                     DateDebut= dateDebut, 
-                    DateFin= dateFin
+                    DateFin= dateFin,
+                    IdLivre= idLivre
 
                 };
                 uow.Reservation.Add(reservation);

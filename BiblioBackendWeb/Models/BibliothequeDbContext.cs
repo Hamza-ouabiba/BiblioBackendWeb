@@ -143,7 +143,7 @@ public partial class BibliothequeDbContext : DbContext
 
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => new { e.IdLivre, e.IdAdherent }).HasName("PK__Reservat__44382DB50ED7A50C");
+            entity.HasKey(e => new { e.IdReservation }).HasName("PK__Reservat__44382DB50ED7A50C");
 
             entity.ToTable("Reservation");
 

@@ -70,8 +70,8 @@ namespace BiblioBackendWeb.Controllers
                 NomAdherent = nomAdherent,
                 PrenomAdherent = prenomAdherent,
                 Email = Email,
-                DateInscription = DateTime.Now.Date
-            };
+                DateInscription = DateTime.Now
+        };
            
 
             using (UnitOfWork uow = new(new BibliothequeDbContext()))

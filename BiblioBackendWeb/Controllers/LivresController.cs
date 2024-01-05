@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BiblioBackendWeb.Models;
 using BiblioBackendWeb.Repository.Implementations;
+using BiblioBackendWeb.Utils;
+using Microsoft.AspNetCore.Components.QuickGrid;
 
 namespace BiblioBackendWeb.Controllers
 {
@@ -25,9 +27,21 @@ namespace BiblioBackendWeb.Controllers
         [HttpGet]
         public IEnumerable<Livre> GetLivres()
         {
-             using (UnitOfWork uow = new(new BibliothequeDbContext()))
+            using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
             {
-                return uow.Livre.GetAll();
+                return uow.Livre.Find(includeProperties: "Auteur,Categorie,Etat")
+                    .Select(l => new Livre
+                    {
+                        IdLivre = l.IdLivre,
+                        Title = l.Title,
+                        Description = l.Description,
+                        Prix = l.Prix,
+                        DatePublication = l.DatePublication,
+                         Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
+                        Etat = new Etat { Nom = l.Etat.Nom },
+                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur },
+                        NbPages = l.NbPages,
+                     }).ToList();
             }
         }
 
@@ -35,14 +49,87 @@ namespace BiblioBackendWeb.Controllers
         [HttpGet("{id}")]
         public Livre GetLivre(int id)
         {
-
-            using (UnitOfWork uow = new(new BibliothequeDbContext()))
+            using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
             {
-                return uow.Livre.Get(id);
-            }
+                Livre livre = uow.Livre.Find(l => l.IdLivre == id, "Auteur,Categorie,Etat")
+                    .FirstOrDefault();
 
+                if (livre != null)
+                {
+                    // Project the related entities if the livre is found
+                    livre.Categorie = new Categorie { NomCategorie = livre.Categorie.NomCategorie };
+                    livre.Etat = new Etat { Nom = livre.Etat.Nom };
+                    livre.Auteur = new Auteur { NomAuteur = livre.Auteur.NomAuteur };
+                }
+                else
+                {
+                    livre =null;
+                }
+
+                return livre;
+            }
         }
 
+
+
+        [HttpGet("title/{title}")]
+        public IEnumerable<Livre> GetLivreByTitle(string title)
+        {
+            using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
+            {
+                IEnumerable < Livre > livres= uow.Livre.Find(l => l.Title.StartsWith(title), "Auteur,Categorie,Etat")
+                    .Select(l => new Livre
+                    {
+                        IdLivre = l.IdLivre,
+                        Title = l.Title,
+                        Description = l.Description,
+                        Prix = l.Prix,
+                        DatePublication = l.DatePublication,
+                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
+                        Etat = new Etat { Nom = l.Etat.Nom },
+                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur },
+                        NbPages = l.NbPages,
+                    }) ;
+
+                if (livres == null)
+                {
+                    // Return a 404 Not Found response if the livre is not found
+                    return [];
+                }
+
+                // Return the livre if found
+                return livres;
+            }
+        }
+        [HttpGet("Categorie/{idCategory}")]
+        public IEnumerable<Livre> GetLivreByCategory(int idCategory)
+        {
+            using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
+            {
+                IEnumerable<Livre> livres = uow.Livre.Find(l => l.IdCategorie == idCategory, "Auteur,Categorie,Etat")
+                    .Select(l => new Livre
+                    {
+                        IdLivre = l.IdLivre,
+                        Title = l.Title,
+                        Description = l.Description,
+                        Prix = l.Prix,
+                        DatePublication = l.DatePublication,
+                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
+                        Etat = new Etat { Nom = l.Etat.Nom },
+                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur },
+                        NbPages = l.NbPages,
+                    }) ;
+
+                if (livres == null)
+                {
+                    // Return a 404 Not Found response if the livre is not found
+                    return [];
+                }
+
+                // Return the livre if found
+                return livres;
+            }
+        }
         // PUT: api/Livres/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
