@@ -34,7 +34,7 @@ namespace BiblioBackendWeb.Controllers
 
         // GET: api/Reservations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Reservation>> GetReservation(int id)
+        public Reservation GetReservation(int id)
         {
             using (UnitOfWork uow = new(new BibliothequeDbContext()))
             {
