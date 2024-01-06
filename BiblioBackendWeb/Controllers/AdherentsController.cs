@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BiblioBackendWeb.Models;
 using BiblioBackendWeb.Repository.Implementations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BiblioBackendWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class AdherentsController : ControllerBase
     {
         private readonly BibliothequeDbContext _context;

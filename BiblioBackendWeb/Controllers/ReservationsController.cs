@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BiblioBackendWeb.Models;
 using BiblioBackendWeb.Repository.Implementations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BiblioBackendWeb.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase

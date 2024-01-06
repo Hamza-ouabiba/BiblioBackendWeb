@@ -9,9 +9,12 @@ using BiblioBackendWeb.Models;
 using BiblioBackendWeb.Repository.Implementations;
 using BiblioBackendWeb.Utils;
 using Microsoft.AspNetCore.Components.QuickGrid;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BiblioBackendWeb.Controllers
 {
+   
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class LivresController : ControllerBase
@@ -36,6 +39,7 @@ namespace BiblioBackendWeb.Controllers
                         Title = l.Title,
                         Description = l.Description,
                         Prix = l.Prix,
+                        Couverture = l.Couverture,
                         DatePublication = l.DatePublication,
                          Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
                         Etat = new Etat { Nom = l.Etat.Nom },
@@ -84,6 +88,7 @@ namespace BiblioBackendWeb.Controllers
                         Title = l.Title,
                         Description = l.Description,
                         Prix = l.Prix,
+                        Couverture = l.Couverture,
                         DatePublication = l.DatePublication,
                         Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
                         Etat = new Etat { Nom = l.Etat.Nom },
@@ -113,6 +118,7 @@ namespace BiblioBackendWeb.Controllers
                         Title = l.Title,
                         Description = l.Description,
                         Prix = l.Prix,
+                        Couverture = l.Couverture,
                         DatePublication = l.DatePublication,
                         Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
                         Etat = new Etat { Nom = l.Etat.Nom },

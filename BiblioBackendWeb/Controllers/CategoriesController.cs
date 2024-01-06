@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BiblioBackendWeb.Models;
 using BiblioBackendWeb.Repository.Implementations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BiblioBackendWeb.Controllers
 {
-    [Route("api/[controller]")]
+    [AllowAnonymous]
+    [Route("api/[controller]")] 
     [ApiController]
     public class CategoriesController : ControllerBase
     {
@@ -23,6 +25,7 @@ namespace BiblioBackendWeb.Controllers
 
         // GET: api/Categories
         [HttpGet]
+         [AllowAnonymous]
         public  IEnumerable<Categorie> GetCategories()
         {
             using (UnitOfWork uow = new(new BibliothequeDbContext()))
