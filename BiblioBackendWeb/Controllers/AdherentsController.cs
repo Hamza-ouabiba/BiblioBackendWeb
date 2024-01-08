@@ -85,9 +85,7 @@ namespace BiblioBackendWeb.Controllers
 
 
         }
-       
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("Login")]
+        [HttpPost("Login")] 
         public IActionResult LoginAdherent(string Email, string Password)
         {
             try
@@ -96,6 +94,9 @@ namespace BiblioBackendWeb.Controllers
                 {
                     using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
                     {
+                        Console.WriteLine($"email: {Email}");
+                        Console.WriteLine($"Password: {Password}");
+
                         if (!string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password))
                         {
                             Adherent adherent = uow.Adherent.CurrentAdherent(Email, Password);
@@ -103,35 +104,40 @@ namespace BiblioBackendWeb.Controllers
                             if (adherent != null)
                             {
                                 // Authentication successful, you can proceed with further actions
-                                return Ok(new { Message = "Login successful", adherent = adherent, success = true });
+                                return Ok(new { Message = "Login successful", data = adherent, success = true });
                             }
                             else
                             {
-                                return BadRequest(new { Message = "Invalid credentials" });
+                                // Invalid credentials
+                                return BadRequest(new { Message = "Invalid credentials", success = false });
                             }
                         }
                         else
                         {
+                            // Email and Password are required
                             return BadRequest(new { Message = "Email and Password are required", success = false });
                         }
                     }
                 }
                 else
                 {
-                    return BadRequest(new { Message = "Invalid model state",success = false, Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
+                    // Invalid model state
+                    return BadRequest(new { Message = "Invalid model state", success = false, Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
                 }
             }
             catch (Exception ex)
             {
                 // Log the exception for debugging purposes
+                // Consider using a logging library like Serilog or log4net
+                Console.WriteLine($"Exception: {ex.Message}"); 
+                 
                 // Don't expose detailed exception information in a production environment
-                return StatusCode(500, new { Message = "An error occurred while processing the request" });
+                return StatusCode(500, new { Message = "An error occurred while processing the request", success = false });
             }
         }
 
-       
-                // DELETE: api/Adherents/5
-                [HttpDelete("{id}")]
+        // DELETE: api/Adherents/5
+        [HttpDelete("{id}")]
         public void DeleteAdherent(int id)
         {
             using (UnitOfWork uow = new(new BibliothequeDbContext()))
