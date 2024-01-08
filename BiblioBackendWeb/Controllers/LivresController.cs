@@ -41,9 +41,9 @@ namespace BiblioBackendWeb.Controllers
                         Prix = l.Prix,
                         Couverture = l.Couverture,
                         DatePublication = l.DatePublication,
-                         Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
-                        Etat = new Etat { Nom = l.Etat.Nom },
-                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur },
+                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
+                        Etat = new Etat { Nom = l.Etat.Nom,IdEtat=l.Etat.IdEtat },
+                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur, IdAuteur = l.Auteur.IdAuteur },
                         NbPages = l.NbPages,
                      }).ToList();
             }

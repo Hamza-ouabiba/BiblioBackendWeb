@@ -85,8 +85,53 @@ namespace BiblioBackendWeb.Controllers
 
 
         }
-        // DELETE: api/Adherents/5
-        [HttpDelete("{id}")]
+       
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("Login")]
+        public IActionResult LoginAdherent(string Email, string Password)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
+                    {
+                        if (!string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password))
+                        {
+                            Adherent adherent = uow.Adherent.CurrentAdherent(Email, Password);
+
+                            if (adherent != null)
+                            {
+                                // Authentication successful, you can proceed with further actions
+                                return Ok(new { Message = "Login successful", adherent = adherent, success = true });
+                            }
+                            else
+                            {
+                                return BadRequest(new { Message = "Invalid credentials" });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new { Message = "Email and Password are required", success = false });
+                        }
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Invalid model state",success = false, Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // Don't expose detailed exception information in a production environment
+                return StatusCode(500, new { Message = "An error occurred while processing the request" });
+            }
+        }
+
+       
+                // DELETE: api/Adherents/5
+                [HttpDelete("{id}")]
         public void DeleteAdherent(int id)
         {
             using (UnitOfWork uow = new(new BibliothequeDbContext()))
@@ -98,9 +143,6 @@ namespace BiblioBackendWeb.Controllers
             }
         }
 
-        private bool AdherentExists(int id)
-        {
-            return _context.Adherents.Any(e => e.IdAdherent == id);
-        }
+       
     }
 }

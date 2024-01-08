@@ -76,7 +76,8 @@ namespace BiblioBackendWeb.Controllers
                     IdAdherent = idAdherent,
                     DateDebut= dateDebut, 
                     DateFin= dateFin,
-                    IdLivre= idLivre
+                    IdLivre= idLivre,
+                    Status=false
 
                 };
                 uow.Reservation.Add(reservation);
