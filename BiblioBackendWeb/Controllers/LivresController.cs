@@ -41,11 +41,12 @@ namespace BiblioBackendWeb.Controllers
                         Prix = l.Prix,
                         Couverture = l.Couverture,
                         DatePublication = l.DatePublication,
-                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
-                        Etat = new Etat { Nom = l.Etat.Nom,IdEtat=l.Etat.IdEtat },
+                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie, IdCategorie = l.Categorie.IdCategorie },
+                        Etat = new Etat { Nom = l.Etat.Nom, IdEtat = l.Etat.IdEtat },
                         Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur, IdAuteur = l.Auteur.IdAuteur },
                         NbPages = l.NbPages,
-                     }).ToList();
+
+                    }).ToList();
             }
         }
 
@@ -61,9 +62,9 @@ namespace BiblioBackendWeb.Controllers
                 if (livre != null)
                 {
                     // Project the related entities if the livre is found
-                    livre.Categorie = new Categorie { NomCategorie = livre.Categorie.NomCategorie };
-                    livre.Etat = new Etat { Nom = livre.Etat.Nom };
-                    livre.Auteur = new Auteur { NomAuteur = livre.Auteur.NomAuteur };
+                    livre.Categorie = new Categorie { NomCategorie = livre.Categorie.NomCategorie , IdCategorie = livre.Categorie.IdCategorie };
+                    livre.Etat = new Etat { Nom = livre.Etat.Nom, IdEtat = livre.Etat.IdEtat };
+                    livre.Auteur = new Auteur { NomAuteur=livre.Auteur.NomAuteur, IdAuteur = livre.Auteur.IdAuteur }; 
                 }
                 else
                 {
@@ -90,9 +91,9 @@ namespace BiblioBackendWeb.Controllers
                         Prix = l.Prix,
                         Couverture = l.Couverture,
                         DatePublication = l.DatePublication,
-                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie },
-                        Etat = new Etat { Nom = l.Etat.Nom },
-                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur },
+                        Categorie = new Categorie { NomCategorie = l.Categorie.NomCategorie, IdCategorie = l.Categorie.IdCategorie },
+                        Etat = new Etat { Nom = l.Etat.Nom, IdEtat = l.Etat.IdEtat },
+                        Auteur = new Auteur { NomAuteur = l.Auteur.NomAuteur, IdAuteur = l.Auteur.IdAuteur },
                         NbPages = l.NbPages,
                     }) ;
 

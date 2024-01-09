@@ -44,7 +44,33 @@ namespace BiblioBackendWeb.Controllers
             }
             
         }
+        [HttpGet("Adherent/{idAdherent}")]
+        public IEnumerable<Reservation> GetReservationByIDAdherent(int idAdherent)
+        {
+            using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
+            {
+                IEnumerable<Reservation> reservation = uow.Reservation.Find(l => l.IdAdherent== idAdherent, "Livre")
+                    .Select(l => new Reservation
+                    {
+                        IdAdherent = l.IdLivre,
+                        IdLivre = l.IdLivre, 
+                        DateDebut = l.DateDebut,
+                        DateFin = l.DateFin,
+                        Status = l.Status,
+                        Livre = new Livre { IdLivre = l.Livre.IdLivre, IdCategorie = l.Livre.IdCategorie,IdAuteur = l.Livre.IdAuteur },
+                      
+                     });
 
+                if (reservation == null)
+                {
+                    // Return a 404 Not Found response if the livre is not found
+                    return [];
+                }
+
+                // Return the livre if found
+                return reservation;
+            }
+        }
         // PUT: api/Reservations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -67,24 +93,49 @@ namespace BiblioBackendWeb.Controllers
         // POST: api/Reservations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async void PostReservation(int idAdherent,int idLivre, DateTime dateDebut, DateTime dateFin)
+        public IActionResult PostReservation(int idAdherent, int idLivre, DateTime dateDebut, DateTime dateFin)
         {
-            using (UnitOfWork uow = new(new BibliothequeDbContext()))
+            try
             {
-                Reservation reservation = new Reservation()
+                using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
                 {
-                    IdAdherent = idAdherent,
-                    DateDebut= dateDebut, 
-                    DateFin= dateFin,
-                    IdLivre= idLivre,
-                    Status=false
+                     
+                       Reservation reservation = new Reservation()
+                        {
+                            IdAdherent = idAdherent,
+                            DateDebut = dateDebut,
+                            DateFin = dateFin,
+                            IdLivre = idLivre,
+                            Status = false
+                        };
 
-                };
-                uow.Reservation.Add(reservation);
-                uow.Complete(); 
+                        uow.Reservation.Add(reservation);
 
-            } 
+                        if (uow.Complete() > 0)
+                        { 
+                            Livre livre = uow.Livre.Get(idLivre);
+
+                            Etat etat = uow.Etat.Find(e => e.IdEtat == 2).FirstOrDefault();
+
+                            livre.Etat = etat; 
+
+                            uow.Complete();
+
+                            return Ok(new { message = "Reservation added successfully", success = true });
+                        }
+                        else
+                        {
+                            return BadRequest(new { message = "Failed to add reservation", success = false });
+                        }
+                 
+                 }
+                }
+            catch (Exception ex)
+            { 
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}", success = false });
+            }
         }
+
 
         // DELETE: api/Reservations/5
         [HttpDelete("{id}")]
