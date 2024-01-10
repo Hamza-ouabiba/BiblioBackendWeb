@@ -57,7 +57,7 @@ namespace BiblioBackendWeb.Controllers
                         DateDebut = l.DateDebut,
                         DateFin = l.DateFin,
                         Status = l.Status,
-                        Livre = new Livre {  IdLivre = l.Livre.IdLivre, IdCategorie = l.Livre.IdCategorie,IdAuteur = l.Livre.IdAuteur, Couverture = l.Livre.Couverture },
+                        Livre = new Livre {  IdLivre = l.Livre.IdLivre, Title = l.Livre.Title, IdCategorie = l.Livre.IdCategorie,IdAuteur = l.Livre.IdAuteur, Couverture = l.Livre.Couverture },
                         IdReservation = l.IdReservation,
 
 
