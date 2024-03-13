@@ -10,6 +10,6 @@ namespace BiblioBackendWeb.Repository.Interfaces
 {
     public interface IAdherentRepository : IRepository<Adherent>
     {
-
+        Adherent CurrentAdherent(string username, string password);
     }
 }

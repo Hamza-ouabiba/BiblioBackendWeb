@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BiblioBackendWeb.Models;
 using BiblioBackendWeb.Repository.Implementations;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace BiblioBackendWeb.Controllers
 {
@@ -35,14 +37,42 @@ namespace BiblioBackendWeb.Controllers
 
         // GET: api/Adherents/5
         [HttpGet("{id}")]
-        public  Adherent GetAdherent(int id)
+   
+        public ActionResult<Adherent> GetAdherent(int id)
         {
-             using (UnitOfWork uow = new(new BibliothequeDbContext()))
+            using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
             {
-                return uow.Adherent.Get(id);
+                Adherent adherent = uow.Adherent.Find(a => a.IdAdherent == id).FirstOrDefault();
+
+                if (adherent != null)
+                {
+                    // Project the related entities if the adherent is found 
+                    Reservation[] reservations = uow.Reservation.Find(r => r.IdAdherent == id).ToArray(); ;
+                    if (reservations != null)
+                    {
+                        adherent.Reservations = new List<Reservation>(reservations);
+                    }
+
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        ReferenceHandler = ReferenceHandler.Preserve,
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+                        // Add any other options you need
+                    };
+
+                    string json = JsonSerializer.Serialize(adherent, options);
+                    return Content(json, "application/json");  
+
+                    return adherent;
+
+                }
+                else
+                {
+
+                    return NotFound();
+                }
             }
-             
-        }
+        } 
 
         // PUT: api/Adherents/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -54,8 +84,8 @@ namespace BiblioBackendWeb.Controllers
                 Adherent adherent = uow.Adherent.Get(id);
                 adherent.Email = Email;
                 adherent.PrenomAdherent = prenomAdherent;
-                adherent.NomAdherent = nomAdherent;
-              
+                adherent.NomAdherent = nomAdherent; 
+
 
                 uow.Complete();
 
@@ -85,6 +115,57 @@ namespace BiblioBackendWeb.Controllers
 
 
         }
+        [HttpPost("Login")] 
+        public IActionResult LoginAdherent(string Email, string Password)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    using (UnitOfWork uow = new UnitOfWork(new BibliothequeDbContext()))
+                    {
+                        Console.WriteLine($"email: {Email}");
+                        Console.WriteLine($"Password: {Password}");
+
+                        if (!string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password))
+                        {
+                            Adherent adherent = uow.Adherent.CurrentAdherent(Email, Password);
+
+                            if (adherent != null)
+                            {
+                                // Authentication successful, you can proceed with further actions
+                                return Ok(new { Message = "Login successful", data = adherent, success = true });
+                            }
+                            else
+                            {
+                                // Invalid credentials
+                                return BadRequest(new { Message = "Invalid credentials", success = false });
+                            }
+                        }
+                        else
+                        {
+                            // Email and Password are required
+                            return BadRequest(new { Message = "Email and Password are required", success = false });
+                        }
+                    }
+                }
+                else
+                {
+                    // Invalid model state
+                    return BadRequest(new { Message = "Invalid model state", success = false, Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // Consider using a logging library like Serilog or log4net
+                Console.WriteLine($"Exception: {ex.Message}"); 
+                 
+                // Don't expose detailed exception information in a production environment
+                return StatusCode(500, new { Message = "An error occurred while processing the request", success = false });
+            }
+        }
+
         // DELETE: api/Adherents/5
         [HttpDelete("{id}")]
         public void DeleteAdherent(int id)
@@ -98,9 +179,6 @@ namespace BiblioBackendWeb.Controllers
             }
         }
 
-        private bool AdherentExists(int id)
-        {
-            return _context.Adherents.Any(e => e.IdAdherent == id);
-        }
+       
     }
 }
